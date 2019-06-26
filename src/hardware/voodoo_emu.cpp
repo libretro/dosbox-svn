@@ -73,6 +73,7 @@ iterated W    = 18.32 [48 bits]
 
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 #include "dosbox.h"
 #include "cross.h"
