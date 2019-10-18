@@ -143,7 +143,7 @@ static bool is_restarting = false;
 extern Bit8u RDOSGFXbuffer[1024*768*4];
 extern Bitu RDOSGFXwidth, RDOSGFXheight, RDOSGFXpitch;
 extern unsigned RDOSGFXcolorMode;
-extern void* RDOSGFXhaveFrame;
+extern Bit8u RDOSGFXhaveFrame[sizeof(RDOSGFXbuffer)];
 unsigned currentWidth, currentHeight;
 float currentFPS = 60.0f;
 
@@ -1393,7 +1393,6 @@ void retro_run (void)
 
         /* Upload video */
         video_cb(RDOSGFXhaveFrame, RDOSGFXwidth, RDOSGFXheight, RDOSGFXpitch);
-        RDOSGFXhaveFrame = 0;
 
         /* Upload audio */
         audio_batch_cb((int16_t*)audioData, samplesPerFrame);
