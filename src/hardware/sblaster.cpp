@@ -1703,8 +1703,8 @@ public:
 		/* Soundblaster midi interface */
 		if (!MIDI_Available()) sb.midi = false;
 		else sb.midi = true;
-	}	
-	
+	}
+
 	~SBLASTER() {
 		switch (oplmode) {
 		case OPL_none:
