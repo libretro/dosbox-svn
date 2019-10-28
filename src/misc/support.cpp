@@ -34,6 +34,7 @@
 #include "video.h"
 
 #ifdef __LIBRETRO__
+#include <libco.h>
 #include "libretro.h"
 extern retro_log_printf_t log_cb;
 #endif
@@ -191,9 +192,13 @@ void E_Exit(const char * format,...) {
 	strcat(buf,"\n");
 
 #ifdef __LIBRETRO__
+	extern bool dosbox_exit;
+	extern cothread_t mainThread;
+
 	if(log_cb)
 		log_cb(RETRO_LOG_ERROR, buf);
-#else
-	throw(buf);
+	dosbox_exit = true;
+	co_switch(mainThread);
 #endif
+	throw(buf);
 }
