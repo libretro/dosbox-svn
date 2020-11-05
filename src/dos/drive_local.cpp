@@ -29,7 +29,9 @@
 #include "support.h"
 #include "cross.h"
 #include "inout.h"
-
+#ifdef __CELLOS_LV2__
+#include "libretro_dosbox.h"
+#endif
 
 bool localDrive::FileCreate(DOS_File * * file,char * name,Bit16u /*attributes*/) {
 //TODO Maybe care for attributes but not likely

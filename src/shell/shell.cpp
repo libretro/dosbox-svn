@@ -26,6 +26,9 @@
 #include "shell.h"
 #include "callback.h"
 #include "support.h"
+#ifdef __CELLOS_LV2__
+#include "libretro_dosbox.h"
+#endif
 
 
 Bitu call_shellstop;

@@ -67,6 +67,9 @@
 
 ***************************************************************************/
 
+#ifdef __CELLOS_LV2__
+#include "libretro_dosbox.h"
+#endif
 #include "emu.h"
 #include "saa1099.h"
 

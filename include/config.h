@@ -52,7 +52,9 @@
 #define HAVE_NETINET_IN_H 1
 #define HAVE_STDINT_H 1
 #define HAVE_STDLIB_H 1
+#if !defined(__CELLOS_LV2__)
 #define HAVE_STRINGS_H 1
+#endif
 #define HAVE_STRING_H 1
 #define HAVE_SYS_SOCKET_H 1
 #define HAVE_SYS_STAT_H 1
@@ -157,7 +159,7 @@ typedef uintptr_t Bitu;
 typedef intptr_t Bits;
 #if UINTPTR_MAX == 0xFFFFFFFF
 #define sBitfs sBit32fs
-#elif UINTPTR_MAX == 0xFFFFFFFFFFFFFFFFu
+#elif UINTPTR_MAX == 0xFFFFFFFFFFFFFFFFu || defined(__CELLOS_LV2__)
 #define sBitfs sBit64fs
 #else
 #error "Can't determine pointer size"

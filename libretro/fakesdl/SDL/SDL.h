@@ -12,6 +12,10 @@
 #include <psp2/kernel/threadmgr.h>
 #endif
 
+#ifdef __CELLOS_LV2__
+#include "libretro_dosbox.h"
+#endif
+
 #include <retro_timers.h>
 
 typedef uint8_t Uint8;

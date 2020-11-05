@@ -20,7 +20,10 @@
 
 #include <algorithm>
 #include <string>
+
+#if !defined(__CELLOS_LV2__)
 #include <libgen.h>
+#endif
 
 #include <stdlib.h>
 #include <stdarg.h>
@@ -66,6 +69,46 @@
 
 #ifdef ANDROID
 #include "nonlibc.h"
+#endif
+
+#ifdef __CELLOS_LV2__
+#include <string.h>
+char *dirname(char *path)
+{
+    if(path==NULL) return "/";
+
+    char loc[512];
+
+    strcpy(loc, path);
+
+    int l = strlen(loc);
+    loc[l-1]=0;
+
+    if(strrchr(loc, '/') == NULL) return "/";
+
+    int slash = strrchr(loc, '/')-loc;
+
+    if(slash==0) return "/";
+
+    char *temp = (char *) malloc(slash);
+
+    memcpy(temp, loc, slash);
+
+    return temp;
+}
+int gettimeofday(struct timeval* tv, void* blah)
+{
+	int64_t time = sys_time_get_system_time();
+
+	tv->tv_sec = time / 1000000;
+	tv->tv_usec = time - (tv->tv_sec * 1000000);  // implicit rounding will take care of this for us
+	return 0;
+}
+int access(char *fpath, int unused)
+{
+	struct stat buffer;   
+	return stat(fpath, &buffer); 
+}
 #endif
 
 #define RETRO_DEVICE_JOYSTICK RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_ANALOG, 1)
@@ -1470,7 +1513,7 @@ bool retro_load_game(const struct retro_game_info *game)
             log_cb(RETRO_LOG_INFO, "[dosbox] loading default configuration %s\n", configPath.c_str());
         }
 
-#ifndef VITA
+#if !defined (VITA) && !defined(__CELLOS_LV2__)
         // Change the current working directory so that it's possible to have paths in .conf and
         // .bat files (like MOUNT commands) that are relative to the content directory.
         std::string dir = gamePath.substr(0, gamePath.find_last_of(PATH_SEPARATOR));

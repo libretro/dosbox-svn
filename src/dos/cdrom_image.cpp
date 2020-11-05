@@ -32,7 +32,7 @@
 #include "support.h"
 #include "setup.h"
 
-#if !defined(WIN32)
+#if !defined(WIN32) && !defined(__CELLOS_LV2__)
 #include <libgen.h>
 #else
 #include <string.h>
