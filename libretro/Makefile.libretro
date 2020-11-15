@@ -177,7 +177,6 @@ else ifeq ($(platform), emscripten)
 else ifeq ($(platform), ps3)
 	TARGET := $(TARGET_NAME)_libretro_$(platform).a
 	WITH_FAKE_SDL = 1
-	NUMPROC = 4
 	COMMONFLAGS += -mhard-float -D__CELLOS_LV2__ -DWITH_FAKE_SDL -D__POWERPC__ -D__ppc__ -DWORDS_BIGENDIAN=1
 	STATIC_LINKING = 1
 	CC = $(CELL_SDK)/host-win32/ppu/bin/ppu-lv2-gcc.exe

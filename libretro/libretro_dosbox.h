@@ -25,14 +25,14 @@
 #define getenv(a)	"/dev_hdd0/SSNE10000/USRDIR/cores/"
 #define	getcwd(a,b)	"/dev_hdd0/SSNE10000/USRDIR/"
 struct timeb {
-	time_t          time;
-	unsigned short  millitm;
-	short           timezone;
-	short           dstflag;
+    time_t          time;
+    unsigned short  millitm;
+    short           timezone;
+    short           dstflag;
 };
 char *dirname(char *path);
-int gettimeofday(struct timeval* tv, void* blah);
-int access(char *fpath, int unused);
+int gettimeofday(struct timeval* tv, void* /*tz*/);
+int access(char *fpath, int /*mode*/);
 #endif
 
 enum core_timing_mode {
