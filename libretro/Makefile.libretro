@@ -8,7 +8,7 @@ SVN_VERSION := " $(shell cat svn)"
 
 UNAME=$(shell uname -s)
 UNAMEM=$(shell uname -m)
-NUMPROC?=$(shell nproc)
+NUMPROC?=$(shell nproc 2>/dev/null)
 ifeq ($(NUMPROC),)
 	NUMPROC=2
 endif
@@ -178,6 +178,7 @@ else ifeq ($(platform), ps3)
 	TARGET := $(TARGET_NAME)_libretro_$(platform).a
 	WITH_FAKE_SDL = 1
 	COMMONFLAGS += -mhard-float -D__CELLOS_LV2__ -DWITH_FAKE_SDL -D__POWERPC__ -D__ppc__ -DWORDS_BIGENDIAN=1
+	CXXFLAGS += -D__STDC_LIMIT_MACROS
 	STATIC_LINKING = 1
 	CC = $(CELL_SDK)/host-win32/ppu/bin/ppu-lv2-gcc.exe
 	CXX = $(CELL_SDK)/host-win32/ppu/bin/ppu-lv2-g++.exe

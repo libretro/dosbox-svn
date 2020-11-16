@@ -6,6 +6,10 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+#ifdef __CELLOS_LV2__
+#include "libretro_dosbox.h"
+#endif
+
 #include <retro_miscellaneous.h>
 
 #ifdef VITA

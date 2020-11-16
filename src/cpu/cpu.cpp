@@ -22,7 +22,9 @@
 #include <stddef.h>
 #include "dosbox.h"
 #include "cpu.h"
+#if !defined (__CELLOS_LV2__)
 #include "memory.h"
+#endif
 #include "debug.h"
 #include "mapper.h"
 #include "setup.h"

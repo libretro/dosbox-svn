@@ -20,7 +20,9 @@
 
 #include <algorithm>
 #include <string>
+#ifndef __CELLOS_LV2__
 #include <libgen.h>
+#endif
 
 #include <stdlib.h>
 #include <stdarg.h>
@@ -1470,7 +1472,7 @@ bool retro_load_game(const struct retro_game_info *game)
             log_cb(RETRO_LOG_INFO, "[dosbox] loading default configuration %s\n", configPath.c_str());
         }
 
-#ifndef VITA
+#if !defined (VITA) && !defined(__CELLOS_LV2__)
         // Change the current working directory so that it's possible to have paths in .conf and
         // .bat files (like MOUNT commands) that are relative to the content directory.
         std::string dir = gamePath.substr(0, gamePath.find_last_of(PATH_SEPARATOR));
@@ -1627,4 +1629,20 @@ extern "C" char *getcwd(char *buffer, size_t len)
   return 0;
 }
 
+#endif
+
+#if defined(__CELLOS_LV2__)
+int gettimeofday(timeval* tv, void* /*tz*/)
+{
+    int64_t time = sys_time_get_system_time();
+
+    tv->tv_sec = time / 1000000;
+    tv->tv_usec = time - (tv->tv_sec * 1000000);  // implicit rounding will take care of this for us
+    return 0;
+}
+int access(const char *fpath, int /*mode*/)
+{
+    struct stat buffer;   
+    return stat(fpath, &buffer); 
+}
 #endif

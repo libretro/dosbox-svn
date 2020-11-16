@@ -9,6 +9,31 @@
 
 # define RETROLOG(msg) printf("%s\n", msg)
 
+#ifdef __CELLOS_LV2__
+#include <math.h>
+#include <sys/time.h>
+#include <sys/sys_time.h>
+#include <sys/timer.h>
+#include <dirent.h>
+#include <sys/cdefs.h>
+#include <ctype.h>
+#include <sys/stat.h>
+#define S_IREAD S_IRUSR
+#define S_IWRITE S_IWUSR
+#define F_OK  0  /* test for existence of file */
+#define S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
+#define getenv(a)  "/dev_hdd0/SSNE10000/USRDIR/cores/"
+#define getcwd(a,b)  "/dev_hdd0/SSNE10000/USRDIR/"
+struct timeb {
+    time_t          time;
+    unsigned short  millitm;
+    short           timezone;
+    short           dstflag;
+};
+int gettimeofday(timeval* tv, void* /*tz*/);
+int access(const char *fpath, int /*mode*/);
+#endif
+
 enum core_timing_mode {
     CORE_TIMING_UNSYNCED,
     CORE_TIMING_MATCH_FPS,

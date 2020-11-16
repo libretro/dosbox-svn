@@ -36,6 +36,9 @@
 #include <pwd.h>
 #endif
 
+#ifdef __CELLOS_LV2__
+#include "libretro_dosbox.h"
+#endif
 
 
 #ifdef WIN32
@@ -105,6 +108,10 @@ void Cross::CreatePlatformConfigDir(std::string& in) {
 	in = "~/Library/Preferences";
 	ResolveHomedir(in);
 	//Don't create it. Assume it exists
+#elif defined (__CELLOS_LV2__)
+	in = getenv("HOME")"dosbox";
+	ResolveHomedir(in);
+	mkdir(in.c_str(),0777);
 #else
 	in = "~/.dosbox";
 	ResolveHomedir(in);
