@@ -2,6 +2,8 @@
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
     JNI_PATH: libretro
+    MAKEFILE_PATH: libretro
+    MAKEFILE: Makefile.libretro
     CORENAME: dosbox_svn
 
 include:
@@ -26,12 +28,9 @@ stages:
 #Desktop
 libretro-build-linux-x64:
   extends:
-    - .core-defs
     - .libretro-linux-x64-make-default
+    - .core-defs
   variables:
-    MAKEFILE_PATH: libretro
-    MAKEFILE: Makefile.libretro
-    platform: unix
     BUNDLED_SDL: 1
   cache:
     key: "$CI_COMMIT_REF_SLUG-linux-x64-1"
@@ -45,11 +44,9 @@ libretro-build-linux-x64:
 
 libretro-build-windows-x64:
   extends:
-    - .core-defs
     - .libretro-windows-x64-mingw-make-default
+    - .core-defs
   variables:
-    MAKEFILE_PATH: libretro
-    MAKEFILE: Makefile.libretro
     CC: gcc
     CXX: g++
     platform: win
@@ -69,8 +66,8 @@ libretro-build-windows-x64:
 # Android
 android-armeabi-v7a:
   extends:
-    - .core-defs
     - .libretro-android-jni-armeabi-v7a
+    - .core-defs
   cache:
     key: "$CI_COMMIT_REF_SLUG-android-armeabi-v7a-1"
     untracked: false
@@ -79,8 +76,8 @@ android-armeabi-v7a:
 
 android-arm64-v8a:
   extends:
-    - .core-defs
     - .libretro-android-jni-arm64-v8a
+    - .core-defs
   cache:
     key: "$CI_COMMIT_REF_SLUG-android-arm64-v8a-1"
     untracked: false
@@ -89,8 +86,8 @@ android-arm64-v8a:
 
 android-x86_64:
   extends:
-    - .core-defs
     - .libretro-android-jni-x86_64
+    - .core-defs
   cache:
     key: "$CI_COMMIT_REF_SLUG-android-x86_64-1"
     untracked: false
@@ -99,8 +96,8 @@ android-x86_64:
 
 android-x86:
   extends:
-    - .core-defs
     - .libretro-android-jni-x86
+    - .core-defs
   cache:
     key: "$CI_COMMIT_REF_SLUG-android-x86-1"
     untracked: false
@@ -110,11 +107,9 @@ android-x86:
 # Static
 libretro-build-libnx-aarch64:
   extends:
-    - .core-defs
     - .libretro-libnx-static-retroarch-master
+    - .core-defs
   variables:
-    MAKEFILE_PATH: libretro
-    MAKEFILE: Makefile.libretro
     BUNDLED_SDL: 0
   cache:
     key: "$CI_COMMIT_REF_SLUG-libnx-aarch64-1"
@@ -124,11 +119,9 @@ libretro-build-libnx-aarch64:
 
 libretro-build-vita:
   extends:
-    - .core-defs
     - .libretro-vita-static-retroarch-master
+    - .core-defs
   variables:
-    MAKEFILE_PATH: libretro
-    MAKEFILE: Makefile.libretro
     BUNDLED_SDL: 0
   cache:
     key: "$CI_COMMIT_REF_SLUG-vita-1"
