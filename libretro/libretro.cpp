@@ -328,6 +328,9 @@ bool mount_disk_image(const char *path, bool silent)
         return false;
     }
 
+    if (path == NULL || path[0] == '\0')
+        return false;
+
     std::string extension = strrchr(path, '.');
     if (extension == ".img")
         log_cb(RETRO_LOG_INFO, "[dosbox] mounting disk as floppy %s\n", path);
@@ -455,6 +458,10 @@ bool mount_disk_image(const char *path, bool silent)
 bool unmount_disk_image(char *path)
 {
     char drive;
+
+    if (path == NULL || path[0] == '\0')
+        return true;
+
     std::string extension = strrchr(path, '.');
 
     if (disk_count == 0)
@@ -545,7 +552,7 @@ static RETRO_CALLCONV bool disk_set_eject_state(bool ejected)
         log_cb(RETRO_LOG_INFO, "[dosbox] tray closed\n");
     disk_tray_ejected = ejected;
 
-    if (disk_count == 0)
+    if (disk_count == 0 || disk_array[disk_get_image_index()] == NULL || disk_array[disk_get_image_index()][0] == '\0')
         return true;
 
     if (ejected)
