@@ -229,6 +229,12 @@ else
 	LDFLAGS += -Wl,-Bdynamic
 	fpic = -fPIC
 endif
+
+ifneq (,$(or $(findstring webos,$(CROSS_COMPILE)),$(findstring starfish,$(CROSS_COMPILE))))
+	WITH_FAKE_SDL=1
+	COMMONFLAGS += -DWITH_FAKE_SDL
+endif
+
 ifeq ($(DEBUG), 1)
 	COMMONFLAGS += -O0 -g
 else
