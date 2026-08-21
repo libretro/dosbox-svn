@@ -38,6 +38,7 @@
 
 #include <libco.h>
 #include "libretro.h"
+#include <streams/file_stream.h>
 #include "libretro_dosbox.h"
 #include "file/file_path.h"
 #include "libretro_core_options.h"
@@ -1297,6 +1298,17 @@ unsigned retro_api_version(void)
 
 void retro_set_environment(retro_environment_t cb)
 {
+   /* Hand file access over to the frontend's VFS when it provides one. CD
+      images are opened through it (see BinaryFile), so content that only the
+      frontend can open - Android SAF content:// URIs - becomes loadable. */
+   {
+      struct retro_vfs_interface_info vfs_iface_info;
+      vfs_iface_info.required_interface_version = 1;
+      vfs_iface_info.iface                      = NULL;
+      if (cb(RETRO_ENVIRONMENT_GET_VFS_INTERFACE, &vfs_iface_info))
+         filestream_vfs_init(&vfs_iface_info);
+   }
+
     environ_cb = cb;
 
     struct retro_log_callback log;
