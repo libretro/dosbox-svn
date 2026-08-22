@@ -27,6 +27,7 @@
 #include <sstream>
 #include <vector>
 #include <sys/stat.h>
+#include <streams/file_stream.h>
 #include "cdrom.h"
 #include "drives.h"
 #include "support.h"
@@ -45,29 +46,32 @@ using namespace std;
 
 CDROM_Interface_Image::BinaryFile::BinaryFile(const char *filename, bool &error)
 {
-	file = new ifstream(filename, ios::in | ios::binary);
-	error = (file == NULL) || (file->fail());
+	file = filestream_open(filename, RETRO_VFS_FILE_ACCESS_READ,
+	                       RETRO_VFS_FILE_ACCESS_HINT_NONE);
+	error = (file == NULL);
 }
 
 CDROM_Interface_Image::BinaryFile::~BinaryFile()
 {
-	delete file;
+	if (file) filestream_close(file);
 	file = NULL;
 }
 
 bool CDROM_Interface_Image::BinaryFile::read(Bit8u *buffer, int seek, int count)
 {
-	file->seekg(seek, ios::beg);
-	file->read((char*)buffer, count);
-	return !(file->fail());
+	if (!file) return false;
+	if (filestream_seek(file, seek, RETRO_VFS_SEEK_POSITION_START) < 0)
+		return false;
+	return filestream_read(file, buffer, count) == (int64_t)count;
 }
 
 int CDROM_Interface_Image::BinaryFile::getLength()
 {
-	file->seekg(0, ios::end);
-	int length = (int)file->tellg();
-	if (file->fail()) return -1;
-	return length;
+	int64_t length;
+	if (!file) return -1;
+	length = filestream_get_size(file);
+	if (length < 0) return -1;
+	return (int)length;
 }
 
 #if defined(C_SDL_SOUND)

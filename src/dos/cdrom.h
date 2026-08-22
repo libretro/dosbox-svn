@@ -149,7 +149,10 @@ private:
 		int getLength();
 	private:
 		BinaryFile();
-		std::ifstream *file;
+		/* RFILE, not ifstream: it goes through the frontend's VFS when one was
+		   handed over, which is how content behind Android's SAF (content://
+		   URIs, which no C library can open) reaches us. Falls back to stdio. */
+		struct RFILE *file;
 	};
 	
 	#if defined(C_SDL_SOUND)
