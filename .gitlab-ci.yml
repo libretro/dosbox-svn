@@ -40,6 +40,22 @@ include:
   - project: 'libretro-infrastructure/ci-templates'
     file: '/osx-x64.yml'
 
+  # MacOS ARM 64-bit
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/osx-arm64.yml'
+
+  # iOS
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/ios-arm64.yml'
+
+  # iOS (armv7)
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/ios9.yml'
+
+  # tvOS
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/tvos-arm64.yml'
+
   ################################## CELLULAR ################################
   # Android
   - project: 'libretro-infrastructure/ci-templates'
@@ -61,6 +77,22 @@ include:
   # PlayStation Vita
   - project: 'libretro-infrastructure/ci-templates'
     file: '/vita-static.yml'
+
+  # Nintendo GameCube
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/ngc-static.yml'
+
+  # Nintendo Wii
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/wii-static.yml'
+
+  # PlayStation Portable
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/psp-static.yml'
+
+  # Emscripten
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/emscripten-static.yml'
 
   #################################### MISC ##################################
   # webOS 32-bit (LGTV)
@@ -158,6 +190,54 @@ libretro-build-osx-x64:
     - strip -u -r -S ${MAKEFILE_PATH}/${CORENAME}_libretro.dylib
     - rm -rf "${HOMEBREW_PREFIX}"
 
+# MacOS ARM 64-bit
+libretro-build-osx-arm64:
+  extends:
+    - .libretro-osx-arm64-make-default
+    - .core-defs
+  variables:
+    platform: osx
+    BUNDLED_SDL: 1
+    PKG_CONFIG_FLAGS: --static
+  script:
+    - make -C ${MAKEFILE_PATH} -f ${MAKEFILE} deps
+    - export LDFLAGS="-L \"$PWD/libretro/deps_bin/lib\""
+    - make -C ${MAKEFILE_PATH} -f ${MAKEFILE} -j${NUMPROC}
+    - strip -u -r -S ${MAKEFILE_PATH}/${CORENAME}_libretro.dylib
+
+# iOS / tvOS
+# The Makefile already knew these targets; what was missing was the jobs. The
+# default template scripts run only make, and this core builds its dependencies
+# first, so each carries its own.
+.dosbox-svn-apple-mobile:
+  variables:
+    BUNDLED_SDL: 1
+    PKG_CONFIG_FLAGS: --static
+  script:
+    - make -C ${MAKEFILE_PATH} -f ${MAKEFILE} deps platform=${platform}
+    - export LDFLAGS="-L \"$PWD/libretro/deps_bin/lib\""
+    - make -C ${MAKEFILE_PATH} -f ${MAKEFILE} -j${NUMPROC} platform=${platform}
+
+libretro-build-ios-arm64:
+  extends:
+    - .libretro-ios-arm64-make-default
+    - .core-defs
+    - .dosbox-svn-apple-mobile
+
+# iOS (armv7) [iOS 9 and up]
+libretro-build-ios9:
+  extends:
+    - .libretro-ios9-make-default
+    - .core-defs
+    - .dosbox-svn-apple-mobile
+
+# tvOS
+libretro-build-tvos-arm64:
+  extends:
+    - .libretro-tvos-arm64-make-default
+    - .core-defs
+    - .dosbox-svn-apple-mobile
+
 ################################### CELLULAR #################################
 # Android ARMv7a
 android-armeabi-v7a:
@@ -212,6 +292,38 @@ libretro-build-libnx-aarch64:
 libretro-build-vita:
   extends:
     - .libretro-vita-static-retroarch-master
+    - .core-defs
+  variables:
+    BUNDLED_SDL: 0
+
+# Nintendo GameCube
+libretro-build-ngc:
+  extends:
+    - .libretro-ngc-static-retroarch-master
+    - .core-defs
+  variables:
+    BUNDLED_SDL: 0
+
+# Nintendo Wii
+libretro-build-wii:
+  extends:
+    - .libretro-wii-static-retroarch-master
+    - .core-defs
+  variables:
+    BUNDLED_SDL: 0
+
+# PlayStation Portable
+libretro-build-psp:
+  extends:
+    - .libretro-psp-static-retroarch-master
+    - .core-defs
+  variables:
+    BUNDLED_SDL: 0
+
+# Emscripten
+libretro-build-emscripten:
+  extends:
+    - .libretro-emscripten-static-retroarch-master
     - .core-defs
   variables:
     BUNDLED_SDL: 0
