@@ -73,9 +73,24 @@ ifeq ($(platform), osx)
 		CXXFLAGS += $(ARCHFLAGS)
 		LDFLAGS += $(ARCHFLAGS)
 	endif
+else ifneq (,$(findstring tvos,$(platform)))
+	# tvOS is iOS as far as this core is concerned - same Darwin, same clang,
+	# same dylib - so it takes the same IOS define and differs only in which
+	# SDK it asks xcodebuild for and which minimum-version flag goes with it.
+	TARGET := $(TARGET_NAME)_libretro_tvos.dylib
+	COMMONFLAGS += -DHAVE_POSIX_MEMALIGN=1
+	fpic = -fPIC
+	LDFLAGS += -dynamiclib
+	ifeq ($(IOSSDK),)
+		IOSSDK := $(shell xcodebuild -version -sdk appletvos Path)
+	endif
+	CC = cc -arch arm64 -isysroot $(IOSSDK)
+	CXX = c++ -arch arm64 -isysroot $(IOSSDK)
+	COMMONFLAGS += -DIOS -mappletvos-version-min=11.0
+	LDFLAGS += -mappletvos-version-min=11.0
 else ifneq (,$(findstring ios,$(platform)))
 	TARGET := $(TARGET_NAME)_libretro_ios.dylib
-	COMMONFLAGS += -DHAVE_POSIX_MEMALIGN=1 -marm
+	COMMONFLAGS += -DHAVE_POSIX_MEMALIGN=1
 	fpic = -fPIC
 	LDFLAGS += -dynamiclib
 	ifeq ($(IOSSDK),)
@@ -85,6 +100,9 @@ else ifneq (,$(findstring ios,$(platform)))
 		CC = cc -arch arm64 -isysroot $(IOSSDK)
 		CXX = c++ -arch arm64 -isysroot $(IOSSDK)
 	else
+		# -marm is an ARM32 option, so it belongs with the armv7 build rather
+		# than with both: clang rejects it when the target is arm64.
+		COMMONFLAGS += -marm
 		CC = cc -arch armv7 -isysroot $(IOSSDK)
 		CXX = c++ -arch armv7 -isysroot $(IOSSDK)
 	endif
