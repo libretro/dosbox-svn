@@ -54,6 +54,7 @@
 #include "ints/int10.h"
 #include "dos/drives.h"
 #include "programs.h"
+#include "cross.h"
 
 #if defined(VITA)
 #  include <psp2/io/fcntl.h>
@@ -251,18 +252,14 @@ bool mount_overlay_filesystem(char drive, const char* path)
 
     struct stat path_stat;
 
-    if (stat(path, &path_stat) == 0 && S_ISDIR(path_stat.st_mode))
+    if (host_stat(path, &path_stat) == 0 && S_ISDIR(path_stat.st_mode))
     {
         log_cb(RETRO_LOG_INFO, "[dosbox] save directory already exists %s\n", path);
     }
     else
     {
         log_cb(RETRO_LOG_INFO, "[dosbox] creating save directory %s\n", path);
-#if (WIN32)
-        if (mkdir(path) == -1)
-#else
-        if (mkdir(path, 0700) == -1)
-#endif
+        if (host_mkdir(path) == -1)
         {
             log_cb(RETRO_LOG_INFO, "[dosbox] error creating save directory %s\n", path);
             return false;
@@ -1296,17 +1293,35 @@ unsigned retro_api_version(void)
     return RETRO_API_VERSION;
 }
 
+/* cross.cpp: the frontend VFS that host paths with a scheme go through */
+extern struct retro_vfs_interface* host_vfs;
+extern unsigned host_vfs_version;
+
 void retro_set_environment(retro_environment_t cb)
 {
    /* Hand file access over to the frontend's VFS when it provides one. CD
-      images are opened through it (see BinaryFile), so content that only the
-      frontend can open - Android SAF content:// URIs - becomes loadable. */
+      images are opened through it (see BinaryFile), and from version 3 on -
+      which adds stat, mkdir and directory listing - so are the files and
+      directories of mounted drives (see host_is_vfs_path in cross.cpp), so
+      content that only the frontend can open, like Android SAF paths,
+      becomes loadable. */
    {
       struct retro_vfs_interface_info vfs_iface_info;
-      vfs_iface_info.required_interface_version = 1;
+      vfs_iface_info.required_interface_version = 3;
       vfs_iface_info.iface                      = NULL;
-      if (cb(RETRO_ENVIRONMENT_GET_VFS_INTERFACE, &vfs_iface_info))
+      if (cb(RETRO_ENVIRONMENT_GET_VFS_INTERFACE, &vfs_iface_info) && vfs_iface_info.iface)
+      {
+         host_vfs         = vfs_iface_info.iface;
+         host_vfs_version = vfs_iface_info.required_interface_version;
          filestream_vfs_init(&vfs_iface_info);
+      }
+      else
+      {
+         vfs_iface_info.required_interface_version = 1;
+         vfs_iface_info.iface                      = NULL;
+         if (cb(RETRO_ENVIRONMENT_GET_VFS_INTERFACE, &vfs_iface_info))
+            filestream_vfs_init(&vfs_iface_info);
+      }
    }
 
     environ_cb = cb;

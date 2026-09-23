@@ -26,6 +26,7 @@
 #include "shell.h"
 #include "callback.h"
 #include "support.h"
+#include "cross.h"
 #include "libretro_dosbox.h"
 
 
@@ -433,12 +434,12 @@ public:
 			struct stat test;
 			if (line.length() > CROSS_LEN) continue;
 			strcpy(buffer,line.c_str());
-			if (stat(buffer,&test)) {
+			if (host_stat(buffer,&test)) {
 				if (getcwd(buffer,CROSS_LEN) == NULL) continue;
 				if (strlen(buffer) + line.length() + 1 > CROSS_LEN) continue;
 				strcat(buffer,cross_filesplit);
 				strcat(buffer,line.c_str());
-				if (stat(buffer,&test)) continue;
+				if (host_stat(buffer,&test)) continue;
 			}
 			if (test.st_mode & S_IFDIR) {
 				autoexec[12].Install(std::string("MOUNT C \"") + buffer + "\"");
@@ -453,12 +454,12 @@ public:
 					if (strlen(buffer) + line.length() + 1 > CROSS_LEN) continue;
 					strcat(buffer,cross_filesplit);
 					strcat(buffer,line.c_str());
-					if(stat(buffer,&test)) continue;
+					if(host_stat(buffer,&test)) continue;
 					name = strrchr(buffer,CROSS_FILESPLIT);
 					if(!name) continue;
 				}
 				*name++ = 0;
-				if (access(buffer,F_OK)) continue;
+				if (host_access(buffer)) continue;
 				autoexec[12].Install(std::string("MOUNT C \"") + buffer + "\"");
 				autoexec[13].Install("C:");
 				/* Save the non-modified filename (so boot and imgmount can use it (long filenames, case sensivitive)) */
