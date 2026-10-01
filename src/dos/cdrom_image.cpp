@@ -29,6 +29,7 @@
 #include <sys/stat.h>
 #include <streams/file_stream.h>
 #include "cdrom.h"
+#include "cross.h"
 #include "drives.h"
 #include "support.h"
 #include "setup.h"
@@ -646,11 +647,11 @@ bool CDROM_Interface_Image::GetRealFileName(string &filename, string &pathname)
 {
 	// check if file exists
 	struct stat test;
-	if (stat(filename.c_str(), &test) == 0) return true;
+	if (host_stat(filename.c_str(), &test) == 0) return true;
 	
 	// check if file with path relative to cue file exists
 	string tmpstr(pathname + "/" + filename);
-	if (stat(tmpstr.c_str(), &test) == 0) {
+	if (host_stat(tmpstr.c_str(), &test) == 0) {
 		filename = tmpstr;
 		return true;
 	}
@@ -664,7 +665,7 @@ bool CDROM_Interface_Image::GetRealFileName(string &filename, string &pathname)
 	localDrive *ldp = dynamic_cast<localDrive*>(Drives[drive]);
 	if (ldp) {
 		ldp->GetSystemFilename(tmp, fullname);
-		if (stat(tmp, &test) == 0) {
+		if (host_stat(tmp, &test) == 0) {
 			filename = tmp;
 			return true;
 		}
@@ -681,13 +682,13 @@ bool CDROM_Interface_Image::GetRealFileName(string &filename, string &pathname)
 		if(copy[i] == '\\') copy[i] = '/';
 	}
 
-	if (stat(copy.c_str(), &test) == 0) {
+	if (host_stat(copy.c_str(), &test) == 0) {
 		filename = copy;
 		return true;
 	}
 
 	tmpstr = pathname + "/" + copy;
-	if (stat(tmpstr.c_str(), &test) == 0) {
+	if (host_stat(tmpstr.c_str(), &test) == 0) {
 		filename = tmpstr;
 		return true;
 	}
